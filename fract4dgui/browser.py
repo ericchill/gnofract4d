@@ -93,6 +93,7 @@ class BrowserDialog(dialog.T):
 
     def onRefresh(self):
         self.f.refresh()
+        self.populate_file_list() # pick up any new files
         self.set_file(self.model.current.fname) # update text window
 
     def get_current_text(self):

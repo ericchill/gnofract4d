@@ -20,12 +20,13 @@ class TypeInfo:
         self.formula = None
         self.formulas = []
         self.compiler = compiler
-        self.update_files()
 
-    def update_files(self):
-        self.files = self.compiler.find_files_of_type(self.formula_type)
-        self.files.sort(stricmp)
-        
+    def files(self):
+        print "TypeInfo.files"
+        files = self.compiler.find_files_of_type(self.formula_type)
+        files.sort(stricmp)
+        return files
+
     def set_file(self,fname):
         if self.fname == fname:
             return
@@ -142,7 +143,6 @@ class T:
         return self.typeinfo[t]
 
     def update(self,fname,formula):
-        self.current.update_files()
         self.set_file(fname)
         self.set_formula(formula)
 
