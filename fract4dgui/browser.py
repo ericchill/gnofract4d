@@ -145,7 +145,7 @@ class BrowserDialog(dialog.T):
         # find all appropriate files and add to file list
         self.file_list.clear()
 
-        files = self.model.current.files
+        files = self.model.current.files()
         
         current_iter = None
         index,i = 0,0
