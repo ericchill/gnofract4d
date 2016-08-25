@@ -97,8 +97,8 @@ class MainWindow:
 
         # create these properly later to avoid 'end from FAM server connection' messages
         self.saveas_fs = None
-        self.saveimage_fs = None
-        self.hires_image_fs = None
+        self.save_image_fs = None
+        self.save_hires_image_fs = None
         self.open_fs = None        
         
         self.window.show_all()
@@ -216,24 +216,24 @@ class MainWindow:
         return self.saveas_fs
     
     def get_save_image_as_fs(self):
-        if self.saveimage_fs == None:
-            self.saveimage_fs = self.get_file_save_chooser(
+        if self.save_image_fs == None:
+            self.save_image_fs = self.get_file_save_chooser(
                 _("Save Image"),
                 self.window,
                 image.file_matches())
-        return self.saveimage_fs
+        return self.save_image_fs
 
     def get_save_hires_image_as_fs(self):
-        if self.hires_image_fs == None:
-            self.saveimage_fs = self.get_file_save_chooser(
+        if self.save_hires_image_fs == None:
+            self.save_hires_image_fs = self.get_file_save_chooser(
                 _("Save High Resolution Image"),
                 self.window,
                 image.file_matches())
 
             rtd_widgets = self.create_rtd_widgets()
-            self.saveimage_fs.set_extra_widget(rtd_widgets)
+            self.save_hires_image_fs.set_extra_widget(rtd_widgets)
 
-        return self.saveimage_fs
+        return self.save_hires_image_fs
         
     def get_open_fs(self):
         if self.open_fs != None:
