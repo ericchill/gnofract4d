@@ -1105,7 +1105,7 @@ class MainWindow:
                 _("Error saving to file %s") % file, err)
             return False
 
-    def save(self,action):
+    def save(self, action=None):
         """Save the current parameters."""
         if self.filename == None:
             self.saveas(action)
@@ -1406,7 +1406,7 @@ class MainWindow:
             response = d.run()                
             d.destroy()
             if response == gtk.RESPONSE_ACCEPT:
-                self.save(None,None)
+                self.save()
             elif response == gtk.RESPONSE_CANCEL:
                 return False
             elif response == hig.SaveConfirmationAlert.NOSAVE:
