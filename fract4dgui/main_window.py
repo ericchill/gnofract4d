@@ -24,8 +24,9 @@ import icons, flickr_assistant, renderqueue, director
 re_ends_with_num = re.compile(r'\d+\Z')
 re_cleanup = re.compile(r'[\s\(\)]+')
 
-class MainWindow:
+class MainWindow(gtk.Window):
     def __init__(self, extra_paths=[]):
+        gtk.Window.__init__(self)
         self.quit_when_done =False
         self.save_filename = None
         self.compress_saves = True
@@ -33,13 +34,11 @@ class MainWindow:
         self.use_preview = True
 
         self.four_d_sensitives = []
-        # window widget
-
+        
         self.set_icon()
         
-        self.window = gtk.Window()
-        self.window.set_default_size(900,700)
-        self.window.connect('delete-event', self.quit)
+        self.set_default_size(900,700)
+        self.connect('delete-event', self.quit)
 
         # keyboard handling
         self.keymap = {
@@ -51,8 +50,8 @@ class MainWindow:
             }
 
         self.accelgroup = gtk.AccelGroup()
-        self.window.add_accel_group(self.accelgroup)
-        self.window.connect('key-release-event', self.on_key_release)
+        self.add_accel_group(self.accelgroup)
+        self.connect('key-release-event', self.on_key_release)
 
         # create fractal compiler and load standard formula and
         # coloring algorithm files
@@ -64,7 +63,7 @@ class MainWindow:
         self.recent_files = preferences.userPrefs.get_list("recent_files")
         
         self.vbox = gtk.VBox()
-        self.window.add(self.vbox)
+        self.add(self.vbox)
         
         self.f = gtkfractal.T(self.compiler,self)            
         self.f.freeze() # create frozen - main prog will thaw us
@@ -101,7 +100,7 @@ class MainWindow:
         self.save_hires_image_fs = None
         self.open_fs = None        
         
-        self.window.show_all()
+        self.show_all()
 
         self.update_subfract_visibility(False)
         self.populate_warpmenu(self.f)
@@ -152,9 +151,9 @@ class MainWindow:
             1,1)        
         return table
     
-    def get_file_save_chooser(self, title, parent, patterns=[]):
+    def get_file_save_chooser(self, title, patterns=[]):
         chooser = gtk.FileChooserDialog(
-            title, parent, gtk.FILE_CHOOSER_ACTION_SAVE,
+            title, self, gtk.FILE_CHOOSER_ACTION_SAVE,
             (gtk.STOCK_OK, gtk.RESPONSE_OK, gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
 
         filter = gtk.FileFilter()
@@ -197,21 +196,10 @@ class MainWindow:
 
         chooser.set_filter(all_filter)
 
-    def get_file_open_chooser(self, parent):
-        chooser = gtk.FileChooserDialog(
-            title, parent, gtk.FILE_CHOOSER_ACTION_OPEN,
-            (gtk.STOCK_OK, gtk.RESPONSE_OK, 
-             gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
-
-        self.add_filters(chooser)
-
-        return chooser
-
     def get_save_as_fs(self):
         if self.saveas_fs == None:
             self.saveas_fs = self.get_file_save_chooser(
                 _("Save Parameters"),
-                self.window,
                 ["*.fct"])
         return self.saveas_fs
     
@@ -219,7 +207,6 @@ class MainWindow:
         if self.save_image_fs == None:
             self.save_image_fs = self.get_file_save_chooser(
                 _("Save Image"),
-                self.window,
                 image.file_matches())
         return self.save_image_fs
 
@@ -227,7 +214,6 @@ class MainWindow:
         if self.save_hires_image_fs == None:
             self.save_hires_image_fs = self.get_file_save_chooser(
                 _("Save High Resolution Image"),
-                self.window,
                 image.file_matches())
 
             rtd_widgets = self.create_rtd_widgets()
@@ -240,7 +226,7 @@ class MainWindow:
             return self.open_fs
 
         self.open_fs = gtk.FileChooserDialog(
-            _("Open File"), self.window, 
+            _("Open File"), self,
             gtk.FILE_CHOOSER_ACTION_OPEN,
             (gtk.STOCK_OK, gtk.RESPONSE_OK, 
              gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
@@ -453,7 +439,7 @@ class MainWindow:
         if not self.f.get_saved():
             title += "*"
             
-        self.window.set_title(title)
+        self.set_title(title)
         
     def on_fractal_change(self,*args):
         self.draw()
@@ -486,7 +472,7 @@ class MainWindow:
         self.nudge(0, 1,state)
         
     def on_key_release(self, widget, event):
-        current_widget = self.window.get_focus()
+        current_widget = self.get_focus()
         if isinstance(current_widget, gtk.Entry) or isinstance(current_widget,gtk.TextView):
             # otherwise we steal cursor motion through entry
             return
@@ -665,7 +651,7 @@ class MainWindow:
     def create_ui(self):
         self.manager = gtk.UIManager()
         accelgroup = self.manager.get_accel_group()
-        self.window.add_accel_group(accelgroup)
+        self.add_accel_group(accelgroup)
 
         main_actiongroup = gtk.ActionGroup('Gnofract4D')
         self.main_actiongroup = main_actiongroup
@@ -705,21 +691,21 @@ class MainWindow:
 
     def director(self,*args):
         """Display the Director (animation) window."""
-        director.show(self.window,self.control_box, self.f, True)
+        director.show(self, self.control_box, self.f, True)
         
     def browser(self,*args):
         """Display formula browser."""
-        browser.show(self.window,self.f)
+        browser.show(self, self.f)
 
     def randomize_colors(self,*args):
         """Create a new random color scheme."""
         self.f.make_random_colors(8)
 
     def painter(self,*args):
-        painter.show(self.window,self.f)
+        painter.show(self, self.f)
 
     def add_to_queue(self,name,w,h):
-        renderqueue.show(self.window,None,self.f)
+        renderqueue.show(self, None, self.f)
         renderqueue.instance.add(self.f.f,name,w,h)
         renderqueue.instance.start()
         
@@ -735,35 +721,35 @@ class MainWindow:
         self.set_full_screen(False)
         
     def set_full_screen(self, is_full):
-        if not hasattr(self.window, "fullscreen"):
+        if not hasattr(self, "fullscreen"):
             self.show_warning(
                 _("Sorry, your version of PyGTK does not support full screen display"))
             return
         
         if is_full:
-            self.window.fullscreen()
-            self.window.set_decorated(False)
+            self.fullscreen()
+            self.set_decorated(False)
             self.menubar.hide()
             self.toolbar.hide()
             self.bar.hide()
             self.swindow.set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
-            self.window.move(0, 0)
+            self.move(0, 0)
 
-            screen = self.window.get_screen()
+            screen = self.get_screen()
             preferences.userPrefs.set_size(
                 screen.get_width(),
                 screen.get_height())
             
             # TODO: may be useful for 'desktop mode' one day
-            #self.window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DESKTOP)
-            #self.window.set_keep_below(True)
+            #self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DESKTOP)
+            #self.set_keep_below(True)
         else:
-            self.window.set_decorated(True)
+            self.set_decorated(True)
             self.swindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
             self.menubar.show()
             self.toolbar.show()
             self.bar.show()
-            self.window.unfullscreen()
+            self.unfullscreen()
             
     def create_status_bar(self):
         self.bar = gtk.ProgressBar()        
@@ -1140,7 +1126,7 @@ class MainWindow:
             msg = _("File %s already exists. Overwrite?") % name
             d = hig.ConfirmationAlert(
                 primary=msg,
-                parent=self.window,
+                parent=self,
                 proceed_button=_("Overwrite"))
 
             response = d.run()                
@@ -1150,7 +1136,7 @@ class MainWindow:
             return True
 
     def show_warning(self,message):
-        d = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL,
+        d = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
                               gtk.MESSAGE_WARNING, gtk.BUTTONS_OK,
                               message)
         d.run()
@@ -1168,7 +1154,7 @@ class MainWindow:
         d = hig.ErrorAlert(
             primary=message,
             secondary=secondary_message,
-            parent=self.window)
+            parent=self)
         d.run()
         d.destroy()
 
@@ -1193,18 +1179,18 @@ class MainWindow:
 
     def upload(self,*args):
         """Upload the current image to Flickr.com."""
-        flickr_assistant.show_flickr_assistant(self.window,self.control_box, self.f, True)
+        flickr_assistant.show_flickr_assistant(self, self.control_box, self.f, True)
 
     def view_my_fractals(self, *args):
-        nsid = flickr_assistant.get_user(self.window, self.f)
+        nsid = flickr_assistant.get_user(self, self.f)
         if nsid != "":
             url = "http://flickr.com/photos/%s/" % nsid
-            utils.launch_browser(preferences.userPrefs, url, self.window)
+            utils.launch_browser(preferences.userPrefs, url, self)
 
     def view_group_fractals(self, *args):
         utils.launch_browser(preferences.userPrefs,
                        "http://flickr.com/groups/gnofract4d/pool/",
-                       self.window)
+                       self)
 
     def save_image(self,*args):
         """Save the current image to a file."""
@@ -1242,11 +1228,11 @@ class MainWindow:
         
     def settings(self,*args):
         """Show fractal settings controls."""
-        settings.show_settings(self.window, self.control_box, self.f, False)
+        settings.show_settings(self, self.control_box, self.f, False)
         
     def preferences(self,*args):
         """Change current preferences."""
-        preferences.show_preferences(self.window, self.f)
+        preferences.show_preferences(self, self.f)
         
     def undo(self,*args):
         """Undo the last operation."""
@@ -1296,7 +1282,7 @@ class MainWindow:
 
     def autozoom(self,*args):
         """Display AutoZoom dialog."""
-        autozoom.show_autozoom(self.window, self.f)
+        autozoom.show_autozoom(self, self.f)
 
     def contents(self,*args):
         """Show help file contents page."""
@@ -1313,7 +1299,7 @@ class MainWindow:
         utils.launch_browser(
             preferences.userPrefs,
             url,
-            self.window)
+            self)
         
     def display_help(self,section=None):
         # if yelp is available use docbook XML; otherwise fall back to HTML
@@ -1351,7 +1337,7 @@ class MainWindow:
             utils.launch_browser(
                 preferences.userPrefs,
                 url,
-                self.window)
+                self)
             
         
     def open(self,action):
@@ -1389,7 +1375,7 @@ class MainWindow:
             type = browser.guess_type(file)
             browser.set_type(type)
             browser.update(file)
-            browser.show(self.window, self.f, type)
+            browser.show(self, self.f, type)
 
             return True
         except Exception, err:
@@ -1401,7 +1387,7 @@ class MainWindow:
         while not self.f.is_saved():
             d = hig.SaveConfirmationAlert(
                 document_name=self.display_filename(),
-                parent=self.window)
+                parent=self)
 
             response = d.run()                
             d.destroy()
