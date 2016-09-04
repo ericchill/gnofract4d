@@ -64,11 +64,11 @@ class FormulaTypes:
     # indexed by FormulaTypes above
     extensions = [ "frm", "cfrm", "uxf", "ggr", "pal"]
 
+    @staticmethod
     def extension_from_type(t):
         return FormulaTypes.extensions[t]
 
-    extension_from_type = staticmethod(extension_from_type)
-
+    @staticmethod
     def guess_type_from_filename(filename):
         if FormulaTypes.matches[FormulaTypes.FRACTAL].search(filename):
             return translate.T
@@ -79,16 +79,14 @@ class FormulaTypes:
         elif FormulaTypes.matches[FormulaTypes.GRADIENT].search(filename):
             return translate.GradientFunc
 
-    guess_type_from_filename = staticmethod(guess_type_from_filename)
-
+    @staticmethod
     def guess_formula_type_from_filename(filename):
         for i in xrange(FormulaTypes.NTYPES):
             if FormulaTypes.matches[i].search(filename):
                 return i
         raise ValueError("Unknown file type for '%s'" % filename)
 
-    guess_formula_type_from_filename = staticmethod(guess_formula_type_from_filename)
-
+    @staticmethod
     def guess_gradient_subtype_from_filename(filename):
         filename = filename.lower()
         if filename.endswith(".ugr"):
@@ -101,16 +99,14 @@ class FormulaTypes:
             return FormulaTypes.GRAD_CS
         raise ValueError("Unknown gradient type for '%s'" % filename)
 
-    guess_gradient_subtype_from_filename = staticmethod(
-        guess_gradient_subtype_from_filename)
-
+    @staticmethod
     def isFormula(filename):
         for matcher in FormulaTypes.matches:
             if matcher.search(filename):
                 return True
         return False
-    isFormula = staticmethod(isFormula)
-    
+
+
 class FormulaFile:
     def __init__(self, formulas, contents,mtime,filename):
         self.formulas = formulas

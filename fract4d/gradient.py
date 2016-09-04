@@ -44,6 +44,8 @@ rgb_re = re.compile(r'\s*(\d+)\s+(\d+)\s+(\d+)')
 
 class FileType:
     MAP, GGR, CS, UGR = range(4)
+
+    @staticmethod
     def guess(s):
         s = s.lower()
         if s.endswith(".map"):
@@ -55,8 +57,6 @@ class FileType:
         else:
             # assume a GIMP gradient, those sometimes don't have extensions
             return FileType.GGR
-        
-    guess = staticmethod(guess)
     
 class Blend:
     LINEAR, CURVED, SINE, SPHERE_INCREASING, SPHERE_DECREASING = range(5)

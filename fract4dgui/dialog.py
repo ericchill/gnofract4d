@@ -32,6 +32,7 @@ class T(gtk.Dialog):
         global _dialogs
         _dialogs[self.__class__] = None
     
+    @staticmethod
     def reveal(type, dialog_mode, parent, alt_parent, *args):
         global _dialogs
         if not _dialogs.get(type):
@@ -56,8 +57,6 @@ class T(gtk.Dialog):
             _dialogs[type].hide()
         
         return _dialogs[type]
-    
-    reveal = staticmethod(reveal)
 
     def onResponse(self,widget,id):
         if id == gtk.RESPONSE_CLOSE or \
